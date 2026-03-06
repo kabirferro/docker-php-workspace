@@ -1,0 +1,45 @@
+FROM httpd:2.4
+
+# Install required modules
+RUN apt-get update && apt-get install -y \
+    libapache2-mod-fcgid \
+    && rm -rf /var/lib/apt/lists/*
+
+# Enable required Apache modules
+RUN sed -i \
+    -e 's/^#\(LoadModule .*mod_rewrite.so\)/\1/' \
+    -e 's/^#\(LoadModule .*mod_proxy.so\)/\1/' \
+    -e 's/^#\(LoadModule .*mod_proxy_fcgi.so\)/\1/' \
+    -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' \
+    -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' \
+    -e 's/^#\(LoadModule .*mod_vhost_alias.so\)/\1/' \
+    /usr/local/apache2/conf/httpd.conf
+
+# Configure default access for /var/www/html
+RUN echo '' >> /usr/local/apache2/conf/httpd.conf && \
+    echo '<Directory /var/www/html>' >> /usr/local/apache2/conf/httpd.conf && \
+    echo '    Options Indexes FollowSymLinks' >> /usr/local/apache2/conf/httpd.conf && \
+    echo '    AllowOverride All' >> /usr/local/apache2/conf/httpd.conf && \
+    echo '    Require all granted' >> /usr/local/apache2/conf/httpd.conf && \
+    echo '</Directory>' >> /usr/local/apache2/conf/httpd.conf
+
+# Add DirectoryIndex for index.php
+RUN sed -i 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/apache2/conf/httpd.conf
+
+# Add Listen 443 for SSL
+RUN echo "Listen 443" >> /usr/local/apache2/conf/httpd.conf
+
+# Include virtual host configs
+RUN echo "Include conf/extra/vhosts/*/*.conf" >> /usr/local/apache2/conf/httpd.conf
+
+# Create vhosts directory
+RUN mkdir -p /usr/local/apache2/conf/extra/vhosts
+
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+WORKDIR /var/www/html
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["httpd-foreground"]
