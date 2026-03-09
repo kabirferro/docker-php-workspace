@@ -1,6 +1,6 @@
 # PHP Workspace
 
-A local development environment powered by Docker Compose, including Apache, PHP 7.4, PHP 8.2, MySQL 8, phpMyAdmin and Redis.
+A local development environment powered by Docker Compose, running on **Windows with Docker Desktop**. Includes Apache, PHP 7.4, PHP 8.2, MySQL 8, phpMyAdmin and Redis.
 
 ## Stack
 
@@ -18,7 +18,7 @@ A local development environment powered by Docker Compose, including Apache, PHP
 ## Project structure
 
 ```
-workspace/
+php-workspace/          ← versioned (this repository)
 ├── docker-compose.yml
 ├── .env                  ← local config (not versioned)
 ├── .env.example          ← template to copy
@@ -33,14 +33,19 @@ workspace/
 │   ├── generate-vhosts.sh
 │   └── init-database.sql
 └── README.md
+
+External data (configured via .env, not versioned):
+  WEB_DIR    ← web projects root
+  DB_DIR     ← MySQL data files
+  VHOSTS_DIR ← Apache vhost configs and SSL certs
 ```
 
 ---
 
 ## Requirements
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) with WSL2 backend enabled
-- Windows 10/11 or Linux
+- Windows 10/11
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ---
 
@@ -56,21 +61,28 @@ cd php-workspace
 ### 2. Configure the environment
 
 ```powershell
-cp .env.example .env
+Copy-Item .env.example .env
 ```
 
 Open `.env` and set your paths and credentials:
 
 ```dotenv
-# Path to your web projects folder
-WEB_DIR=C:/path/to/your/web
+# Path to your web projects folder (Windows path)
+WEB_DIR=C:/your-workspace/web
 
-# Path where MySQL data will be stored (created automatically)
-DB_DIR=./data
+# Path where MySQL data will be stored
+DB_DIR=C:/your-workspace/database
 
-# Path to the vhosts folder (created automatically)
-VHOSTS_DIR=./vhosts
+# Path to the vhosts folder
+VHOSTS_DIR=C:/your-workspace/vhosts
+
+# MySQL credentials
+MYSQL_ROOT_PASSWORD=your-root-password
+MYSQL_USER=your-mysql-user
+MYSQL_PASSWORD=your-mysql-password
 ```
+
+Use forward slashes (`/`) in Windows paths — Docker Desktop handles the conversion automatically.
 
 ### 3. Start the containers
 
@@ -79,24 +91,6 @@ docker compose up -d
 ```
 
 On the first run Docker will build the PHP and Apache images — this may take a few minutes.
-
----
-
-## WSL2 setup (recommended for performance)
-
-If your web files live inside WSL2, set `WEB_DIR` to the WSL path:
-
-```dotenv
-WEB_DIR=//wsl.localhost/Ubuntu-24.04/home/youruser/web
-```
-
-This bypasses the NTFS→9P bridge and provides native ext4 performance for PHP (10-50x faster on large projects).
-
-To move your files into WSL2:
-```bash
-# From a WSL2 terminal
-cp -r /mnt/c/path/to/web ~/web
-```
 
 ---
 

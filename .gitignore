@@ -2,5 +2,5 @@
 .env
 
 # Custom data
-data/
+mysql-data/
 vhosts/
