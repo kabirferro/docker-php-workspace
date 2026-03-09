@@ -1,4 +1,4 @@
-# PHP Workspace
+# Docker PHP Workspace
 
 A local development environment powered by Docker Compose, running on **Windows with Docker Desktop**. Includes Apache, PHP 7.4, PHP 8.2, MySQL 8, phpMyAdmin and Redis.
 
