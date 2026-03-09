@@ -1,6 +1,10 @@
 # Environment variables
 .env
 
-# Custom data
-mysql-data/
-vhosts/
+# Custom data (folders tracked via .gitkeep, contents ignored)
+mysql-data/*
+!mysql-data/.gitkeep
+vhosts/*
+!vhosts/.gitkeep
+web/*
+!web/.gitkeep

@@ -32,13 +32,17 @@ php-workspace/          ← versioned (this repository)
 │   ├── Dockerfile.php82
 │   ├── generate-vhosts.sh
 │   └── init-database.sql
+├── mysql-data/           ← MySQL data files (default, contents not versioned)
+├── vhosts/               ← Apache vhost configs & SSL certs (default, contents not versioned)
+├── web/                  ← web projects root (default, contents not versioned)
 └── README.md
-
-External data (configured via .env, not versioned):
-  WEB_DIR    ← web projects root
-  DB_DIR     ← MySQL data files
-  VHOSTS_DIR ← Apache vhost configs and SSL certs
 ```
+
+> **Default paths**: `mysql-data/`, `vhosts/` and `web/` are included in the repository as empty
+> placeholder folders. Docker Compose mounts them by default via the `DB_DIR`, `VHOSTS_DIR` and
+> `WEB_DIR` variables (set to `./mysql-data`, `./vhosts` and `./web` in `.env.example`).
+> You can override any of them in your `.env` with an absolute path if you prefer to keep data
+> outside the project directory.
 
 ---
 
@@ -64,17 +68,19 @@ cd php-workspace
 Copy-Item .env.example .env
 ```
 
-Open `.env` and set your paths and credentials:
+Open `.env` and set your credentials. The three data paths already default to folders inside
+this repository (`./mysql-data`, `./vhosts`, `./web`) — you can leave them as-is or point them
+to any absolute path if you prefer to keep data elsewhere:
 
 ```dotenv
-# Path to your web projects folder (Windows path)
-WEB_DIR=C:/your-workspace/web
+# Default: uses the mysql-data/ folder inside the project
+DB_DIR=./mysql-data
 
-# Path where MySQL data will be stored
-DB_DIR=C:/your-workspace/database
+# Default: uses the vhosts/ folder inside the project
+VHOSTS_DIR=./vhosts
 
-# Path to the vhosts folder
-VHOSTS_DIR=C:/your-workspace/vhosts
+# Default: uses the web/ folder inside the project
+WEB_DIR=./web
 
 # MySQL credentials
 MYSQL_ROOT_PASSWORD=your-root-password
@@ -82,7 +88,8 @@ MYSQL_USER=your-mysql-user
 MYSQL_PASSWORD=your-mysql-password
 ```
 
-Use forward slashes (`/`) in Windows paths — Docker Desktop handles the conversion automatically.
+Use forward slashes (`/`) for both relative and absolute Windows paths — Docker Desktop handles
+the conversion automatically.
 
 ### 3. Start the containers
 
